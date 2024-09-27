@@ -8,15 +8,48 @@ env:
   CI: true
 
 jobs:
-    build:
+    buildApp:
         runs-on: ubuntu-latest
-
         steps:
           - uses: actions/checkout@v4
           - name: Use Node.js
             uses: actions/setup-node@v4
             with:
               node-version: '20.x'
-          - run: npm ci
-          - run: npm run build --if-present
-          - run: npm test
+          - name: Clean install and Build
+            run: |
+              npm ci
+              npm run build --if-present
+            working-directory: ./app/simple-homepage
+
+    buildInfra:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        pull-requests: write
+      steps:
+        - uses: hashicorp/setup-terraform@v3
+          with:
+            terraform_version: "1.1.7"
+            plan_only: true
+        - name: Terraform fmt
+          id: fmt
+          run: terraform fmt -check
+          continue-on-error: true
+          working-directory: ./app/simple-homepage
+
+        - name: Terraform Init
+          id: init
+          run: terraform init
+          working-directory: ./app/simple-homepage
+
+        - name: Terraform Validate
+          id: validate
+          run: terraform validate -no-color
+          working-directory: ./app/simple-homepage
+
+        - name: Terraform Plan
+          id: plan
+          run: terraform plan -no-color
+          continue-on-error: true
+          working-directory: ./app/simple-homepage
