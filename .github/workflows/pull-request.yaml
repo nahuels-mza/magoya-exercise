@@ -1,7 +1,7 @@
 name: Pull Request React App
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, edited, reopened, synchronize]
 env:
   CI: true
 jobs:
@@ -25,6 +25,7 @@ jobs:
           contents: read
           pull-requests: write
          steps:
+          - uses: actions/checkout@v4
           - uses: hashicorp/setup-terraform@v3
             with:
               terraform_version: "1.1.7"
@@ -33,16 +34,20 @@ jobs:
             id: fmt
             run: terraform fmt -check
             continue-on-error: true
+            working-directory: ./terraform
 
           - name: Terraform Init
             id: init
             run: terraform init
+            working-directory: ./terraform
 
           - name: Terraform Validate
             id: validate
             run: terraform validate -no-color
+            working-directory: ./terraform
 
           - name: Terraform Plan
             id: plan
             run: terraform plan -no-color
             continue-on-error: true
+            working-directory: ./terraform
