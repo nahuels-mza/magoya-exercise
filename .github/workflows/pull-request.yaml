@@ -1,7 +1,7 @@
 name: Pull Request React App
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, edited, reopened]
 env:
   CI: true
 jobs:
