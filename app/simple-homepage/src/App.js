@@ -1,25 +1,20 @@
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <div>
+    <header>
+      <h1>My Simple React Home Page</h1>
+    </header>
+    <main>
+      <p>Welcome to my simple React home page! This is a basic example of a React project.</p>
+      <img src="https://picsum.photos/200" alt="Placeholder" />
+      <button onClick={() => {window.location.href="/"}}>New Image</button>
+    </main>
+  </div>
+);
+
 }
 
 export default App;
