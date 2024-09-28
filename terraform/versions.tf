@@ -12,8 +12,7 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
-  config_context = "minikube"
+  config_path = "~/.kube/config"
 }
 provider "aws" {
   region = "us-west-1"

@@ -4,6 +4,8 @@ on:
     types: [opened, edited, reopened, synchronize]
 env:
   CI: true
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_AWS_SECRET_ACCESS_KEYKEY_ID }}
 jobs:
     buildApp:
         runs-on: ubuntu-latest

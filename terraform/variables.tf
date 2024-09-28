@@ -16,3 +16,7 @@ variable "egress_port" {
   default = [80, 80, 443]
 
 }
+variable "s3bucket_state" {
+  type    = string
+  default = "bucket_state"
+}
