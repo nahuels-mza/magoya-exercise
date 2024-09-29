@@ -34,10 +34,11 @@ jobs:
           uses: docker/setup-buildx-action@v3
         - name: Build and push
           uses: docker/build-push-action@v6
+          run: echo "$pwd"
           with:
             push: true
             tags: ${{ vars.DOCKERHUB_USERNAME }}/clockbox:latest
-            working-directory: ./app/simple-homepage
+            context: ./app/simple-homepage/.
 
     buildInfra:
       runs-on: ubuntu-latest
