@@ -34,7 +34,7 @@ jobs:
           uses: docker/build-push-action@v6
           with:
             push: true
-            tags: ${{ vars.DOCKERHUB_USERNAME }}magoya-app:latest
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/magoya-app:latest
             context: ./app/simple-homepage/.
 
     buildInfra:
