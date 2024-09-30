@@ -56,13 +56,13 @@ jobs:
         - name: Terraform Init
           id: init
           run: terraform init
-          working-directory: ./app/simple-homepage
+          working-directory: ./terraform
 
         - name: Terraform Plan
           id: plan
           run: terraform plan -no-color
           continue-on-error: true
-          working-directory: ./app/simple-homepage
+          working-directory: ./terraform
 
     deploy:
         name: Terraform Deploy
@@ -81,5 +81,7 @@ jobs:
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               aws-region: us-west-1
           - name: Initialise project and deploy terraform
+            id: apply
             run: |
               terraform apply --auto-approve=true
+            working-directory: ./terraform
