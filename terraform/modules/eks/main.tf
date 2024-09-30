@@ -7,7 +7,7 @@ module "vpc" {
 
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
-  role_arn = module.iam.eks_iam_role_cluster_arn
+  role_arn = module.iam.eks_iam_role_app_node_arn
   version  = "1.30"
 
   vpc_config {
@@ -22,8 +22,8 @@ resource "aws_eks_cluster" "eks_cluster" {
 resource "aws_eks_node_group" "system-node-group" {
   cluster_name    = var.cluster_name
   node_group_name = "system"
-  node_role_arn   = module.iam.eks_iam_role_cluster_arn
-  subnet_ids      = ["${module.vpc.public_subnet_id[0]}", "${module.vpc.public_subnet_id[1]}"]
+  node_role_arn   = module.iam.eks_iam_role_system_node_arn
+  subnet_ids      = ["${module.vpc.private_subnet_id[0]}", "${module.vpc.private_subnet_id[1]}"]
   instance_types  = [var.instance_type]
 
   capacity_type = "ON_DEMAND"
@@ -41,9 +41,14 @@ resource "aws_eks_node_group" "system-node-group" {
 resource "aws_eks_node_group" "app-node-group" {
   cluster_name    = var.cluster_name
   node_group_name = "application"
-  node_role_arn   = module.iam.eks_iam_role_cluster_arn
-  subnet_ids      = ["${module.vpc.public_subnet_id[0]}", "${module.vpc.public_subnet_id[1]}"]
-  instance_types  = [var.instance_type]
+  node_role_arn   = module.iam.eks_iam_role_app_node_arn
+  subnet_ids = [
+    "${module.vpc.public_subnet_id[0]}",
+    "${module.vpc.public_subnet_id[1]}",
+    "${module.vpc.private_subnet_id[0]}",
+    "${module.vpc.private_subnet_id[1]}"
+  ]
+  instance_types = [var.instance_type]
 
   scaling_config {
     desired_size = 1

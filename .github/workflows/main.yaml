@@ -21,8 +21,10 @@ jobs:
               npm ci
               npm run build --if-present
             working-directory: ./app/simple-homepage
+
     dockerizeApp:
       runs-on: ubuntu-latest
+      needs: buildApp
       steps:
         - uses: actions/checkout@v4
         - name: Login to Docker Hub
@@ -45,6 +47,7 @@ jobs:
         contents: read
         pull-requests: write
       steps:
+        - uses: actions/checkout@v4
         - uses: hashicorp/setup-terraform@v3
           with:
             terraform_version: "1.1.7"
@@ -60,9 +63,10 @@ jobs:
           run: terraform plan -no-color
           continue-on-error: true
           working-directory: ./app/simple-homepage
-        deploy:
+
+    deploy:
         name: Terraform Deploy
-        needs: plan
+        needs: buildInfra
         runs-on: ubuntu-20.04
         steps:
           - uses: actions/checkout@v3

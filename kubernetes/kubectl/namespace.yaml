@@ -1,0 +1,14 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: magoya
+  labels:
+    name: magoya
+
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: grafana
+  labels:
+    name: grafana
