@@ -1,5 +1,5 @@
 # Create a pod
-resource "kubernetes_deployment" "local_server" {
+resource "kubernetes_deployment" "local_app" {
   metadata {
     name = "magoya"
     labels = {
