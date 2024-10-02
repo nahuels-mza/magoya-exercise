@@ -48,13 +48,6 @@ jobs:
         pull-requests: write
       steps:
       - uses: actions/checkout@v4
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v45
-        with:
-          files: |
-            - terraform/**
-            - kubernetes/**
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.1.7"
@@ -64,13 +57,11 @@ jobs:
         working-directory: ./terraform
 
       - name: Terraform Init
-        if: steps.changed-files.outputs.all_changed_files
         id: init
         run: terraform init
         working-directory: ./terraform
 
       - name: Terraform Validate
-        if: steps.changed-files.outputs.all_changed_files
         id: validate
         run: terraform validate -no-color
         working-directory: ./terraform
@@ -83,7 +74,6 @@ jobs:
           aws-region: us-west-1
 
       - name: Terraform Plan
-        if: steps.changed-files.outputs.all_changed_files
         id: plan
         run: terraform plan -no-color
         continue-on-error: true

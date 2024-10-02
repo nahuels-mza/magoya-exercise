@@ -35,6 +35,7 @@ jobs:
           id: changed-files
           uses: tj-actions/changed-files@v45
           with:
+            since_last_remote_comit: false
             files: |
               - app/**
         - name: Login to Docker Hub
@@ -63,27 +64,37 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v45
         with:
-          files: |
-            - terraform/**
-            - kubernetes/**
+          since_last_remote_comit: false
+          files: terraform/**
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.1.7"
       - name: Terraform fmt
         id: fmt
-        run: terraform fmt -check
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files-specific.outputs.all_changed_files }}
+        run: |
+          echo "List all the files that have changed: $ALL_CHANGED_FILES"
+          terraform fmt -check
         working-directory: ./terraform
 
       - name: Terraform Init
-        if: steps.changed-files.outputs.all_changed_files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files-specific.outputs.any_changed }}
         id: init
-        run: terraform init
+        run: |
+          echo "List all the files that have changed: $ALL_CHANGED_FILES"
+          terraform init
         working-directory: ./terraform
 
       - name: Terraform Validate
         if: steps.changed-files.outputs.all_changed_files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files-specific.outputs.all_changed_files }}
         id: validate
-        run: terraform validate -no-color
+        run: |
+          echo "List all the files that have changed: $ALL_CHANGED_FILES"
+          terraform validate -no-color
         working-directory: ./terraform
 
       - name: Configure AWS credentials

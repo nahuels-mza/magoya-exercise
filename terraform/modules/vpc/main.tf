@@ -51,7 +51,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-resource "aws_route_table" "route_table" {
+resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.magoya_vpc.id
 
   route {
@@ -59,15 +59,31 @@ resource "aws_route_table" "route_table" {
     gateway_id = aws_internet_gateway.igw.id
   }
 }
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.magoya_vpc.id
 
-resource "aws_route_table_association" "route_table_association" {
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat.id
+  }
+}
+
+resource "aws_route_table_association" "public_route_table_association" {
   count = 2
 
   subnet_id      = aws_subnet.public_subnet.*.id[count.index]
-  route_table_id = aws_route_table.route_table.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+resource "aws_route_table_association" "private_route_table_association" {
+  count = 2
+
+  subnet_id      = aws_subnet.private_subnet.*.id[count.index]
+  route_table_id = aws_route_table.private_route_table.id
 }
 
 resource "aws_eip" "nat" {
+  domain     = "vpc"
+  depends_on = [aws_internet_gateway.igw]
   tags = {
     Name = "nat"
   }
