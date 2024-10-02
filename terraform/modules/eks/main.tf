@@ -7,7 +7,7 @@ module "vpc" {
 
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
-  role_arn = module.iam.eks_iam_role_app_node_arn
+  role_arn = module.iam.eks_iam_role_system_node_arn
   version  = "1.30"
 
   vpc_config {
@@ -41,7 +41,7 @@ resource "aws_eks_node_group" "system-node-group" {
 resource "aws_eks_node_group" "app-node-group" {
   cluster_name    = var.cluster_name
   node_group_name = "application"
-  node_role_arn   = module.iam.eks_iam_role_app_node_arn
+  node_role_arn   = module.iam.eks_iam_role_system_node_arn
   subnet_ids = [
     "${module.vpc.public_subnet_id[0]}",
     "${module.vpc.public_subnet_id[1]}",
@@ -50,6 +50,7 @@ resource "aws_eks_node_group" "app-node-group" {
   ]
   instance_types = [var.instance_type]
 
+  capacity_type = "ON_DEMAND"
   scaling_config {
     desired_size = 1
     max_size     = 1
@@ -61,4 +62,12 @@ resource "aws_eks_node_group" "app-node-group" {
   }
 }
 
-#aws eks --region us-east-2 update-kubeconfig --name
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+}
