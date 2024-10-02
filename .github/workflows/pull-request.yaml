@@ -1,28 +1,42 @@
 name: Pull Request React App
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, synchronize]
 env:
   CI: true
 jobs:
     buildApp:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
-          - name: Use Node.js
-            uses: actions/setup-node@v4
-            with:
-              node-version: '20.x'
-          - name: Clean install and Build
-            run: |
-              npm ci
-              npm run build --if-present
-            working-directory: ./app/simple-homepage
-
-    dockerizeApp:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
+        - name: Get changed files
+          id: changed-files
+          uses: tj-actions/changed-files@v45
+          with:
+            files: |
+              - app/**
+        - name: Use Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20.x'
+        - name: Clean install and Build
+          if: steps.changed-files.outputs.all_changed_files
+          run: |
+            npm ci
+            npm run build --if-present
+          working-directory: ./app/simple-homepage
+
+    dockerizeApp:
+      needs: buildApp
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: Get changed files
+          id: changed-files
+          uses: tj-actions/changed-files@v45
+          with:
+            files: |
+              - app/**
         - name: Login to Docker Hub
           uses: docker/login-action@v3
           with:
@@ -31,6 +45,7 @@ jobs:
         - name: Set up Docker Buildx
           uses: docker/setup-buildx-action@v3
         - name: Build and push
+          if: steps.changed-files.outputs.all_changed_files
           uses: docker/build-push-action@v6
           with:
             push: true
@@ -44,22 +59,29 @@ jobs:
         pull-requests: write
       steps:
       - uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            - terraform/**
+            - kubernetes/**
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.1.7"
-          plan_only: true
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
-        continue-on-error: true
         working-directory: ./terraform
 
       - name: Terraform Init
+        if: steps.changed-files.outputs.all_changed_files
         id: init
         run: terraform init
         working-directory: ./terraform
 
       - name: Terraform Validate
+        if: steps.changed-files.outputs.all_changed_files
         id: validate
         run: terraform validate -no-color
         working-directory: ./terraform
@@ -72,6 +94,7 @@ jobs:
           aws-region: us-west-1
 
       - name: Terraform Plan
+        if: steps.changed-files.outputs.all_changed_files
         id: plan
         run: terraform plan -no-color
         continue-on-error: true
