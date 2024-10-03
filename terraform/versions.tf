@@ -10,12 +10,12 @@ terraform {
     }
 
   }
-  backend "s3" {
-    bucket  = var.s3bucket_state
-    key     = "./terraform.tfstate"
-    region  = "us-west-1"
-    encrypt = true
-  }
+  #   backend "s3" {
+  #     bucket  = "bucket-state"
+  #     key     = "./terraform.tfstate"
+  #     region  = "us-west-1"
+  #     encrypt = true
+  #   }
 }
 
 provider "kubernetes" {
