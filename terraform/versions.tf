@@ -8,6 +8,13 @@ terraform {
       source  = "hashicorp/aws"
       version = "5.60.0"
     }
+
+  }
+  backend "s3" {
+    bucket  = var.s3bucket_state
+    key     = "./terraform.tfstate"
+    region  = "us-west-1"
+    encrypt = true
   }
 }
 

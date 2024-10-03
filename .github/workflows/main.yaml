@@ -79,8 +79,12 @@ jobs:
         continue-on-error: true
         working-directory: ./terraform
 
-      - name: Terraform Deploy
-        id: deploy
-        run: terraform apply --auto-approve=true
-        working-directory: ./terraform
-        continue-on-error: true
+      # - name: Terraform Deploy
+      #   id: deploy
+      #   run: terraform apply --auto-approve=true
+      #   working-directory: ./terraform
+      #   continue-on-error: true
+
+      # - name: Save terraform state
+      #   id: state
+      #   run: aws s3 sync terraform.tfstate s3://bucket-state --delete

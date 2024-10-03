@@ -4,7 +4,7 @@ Desafío Técnico: DevOps - SRE
 ## Challenge
 See the definition at [full description file](Challenge%20DevOps.pdf)
 
-## Solution
+## Structure Definition
 The solution held in this repository has been divided into 3 areas/folder.
 
 ### App folder
@@ -28,7 +28,39 @@ Every subnet has a large set of IP so we will be ok if we consider that __10.0.0
 
 - The EKS folder contains the cluster definitios as it stands. It generates the cluster within two nodes. The idea is to have a node specific for the kubectl system configuration and any other needed tool to be installed (i.e. a monitoring tool). The aplication node will be used to deploy the aplication image(s) as well as databeses conections, pvc or any other k8s object
 
+## Execute the code
 
-´´´
-aws eks --region us-west-1 update-kubeconfig --name magoya-testing
-´´´
+1. Configure Terraform with AWS credentials
+
+    Use export env variables
+
+    ```
+    export AWS_ACCESS_KEY_ID=
+
+    export AWS_SECRET_ACCESS_KEY=
+    ```
+
+2. Navigate to the [terraform folder](terraform)
+    - Run terraform basic commands to deploy the infra
+    ```
+    terraform init
+    terraform plan
+    terraform apply
+    ```
+
+4. Once the process is complete you can check cluster status by running some kubectl commands
+    - Update your context
+        ```
+        aws eks --region us-west-1 update-kubeconfig --name magoya-testing
+        ```
+    - Check cluster status
+        ```
+        kubectl cluster-info
+        kubectl get ns
+        kubectl get nods
+        .....
+        ```
+5. Deploy the kubernetes objects
+    . As explained above either use terraform, or use kubectl with the *install_k8s.sh* file
+
+6. TODO: Connect to the app deployed
