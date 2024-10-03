@@ -1,13 +1,18 @@
 resource "aws_s3_bucket" "s3" {
-  bucket = var.s3bucket_state
-
+  bucket        = var.s3bucket_state
+  force_destroy = true
   tags = {
     Name = var.s3bucket_state
     Env  = "Terraform"
   }
-  force_destroy = true
 }
 
+resource "aws_s3_bucket_versioning" "versioning" {
+  bucket = aws_s3_bucket.s3.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
 resource "aws_s3_bucket_public_access_block" "pb" {
   bucket = aws_s3_bucket.s3.id
